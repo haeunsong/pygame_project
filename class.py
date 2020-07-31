@@ -73,8 +73,11 @@ class Padlock:
     def collision(self):
         pass 
 
-def key_event():
-    pass 
+def ifPadlockHp0(padlock):
+    for value in padlock.padlock_info.values():
+        if value<=0: return True 
+        else: return False 
+
 
 def main():
     # 메인루틴
@@ -84,7 +87,7 @@ def main():
     player = Player()
 
     while running :
-        badtimer -= 1
+        badtimer -= 2
         screen.fill((102,62,37)) # 갈색 배경으로 초기화
 
         # 화면 구성
@@ -96,9 +99,11 @@ def main():
 
         for y in padlock_y:
             padlock = Padlock(y)
-            padlock.draw()
-            screen.blit(padlock.small_healthbar,(0,y+72)) # 각각 자물쇠 hp 틀 그리기(빨간색)
-
+            if ifPadlockHp0(padlock):
+                screen.blit(pygame.image.load(os.path.join(image_path,'key.png')),(10,y+10))              
+            else: 
+                padlock.draw() 
+                screen.blit(padlock.small_healthbar,(0,y+72)) # 각각 자물쇠 hp 틀 그리기(빨간색)
         player.draw()
         
         # 총알 그리기
@@ -249,15 +254,3 @@ def main():
 
 
 main()
-
-
-        
-
-
-
-
-
-        
-
-        
-

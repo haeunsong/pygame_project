@@ -2,6 +2,7 @@ import pygame,os,math,random,sys
 from pygame.locals import *
 
 pygame.init()
+pygame.font.init()
 
 width, height = 800,500
 screen=pygame.display.set_mode((width,height))
@@ -19,16 +20,17 @@ soil = pygame.image.load(os.path.join(image_path, 'soil.png'))
 key = pygame.image.load(os.path.join(image_path,'key.png'))
 bang = pygame.image.load(os.path.join(image_path,'bang.png'))
 heart = pygame.image.load(os.path.join(image_path,'heart.png'))
-running = 1 # 게임 실행
-exitcode = 0 # 게임 종료
+
+# running = 1 # 게임 실행
+# exitcode = 0 # 1이 되면 게임 종료
 
 class Player:
-    playerpos = [154,150]
+    playerpos = [154,155]
 
     def __init__(self):
         self.image = pygame.image.load(os.path.join(image_path, 'alien.png'))
         self.rect = pygame.Rect(self.image.get_rect())
-        self.hp = 3
+        self.hp = 5
 
     def draw(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -81,10 +83,13 @@ def ifPadlockHp0(padlock):
 
 def main():
     # 메인루틴
-    badtimer = 100
-    badguys = [[1000,random.randint(100,400)]] # 적 처음 위치
+    running = 1
+    badtimer = 50
+    badguys = [[800,random.randint(50,450)]] # 적 처음 위치
     enemy = Enemy()
     player = Player()
+    padlockToKey = False 
+    gameOver = 0
 
     while running :
         badtimer -= 2
@@ -101,6 +106,7 @@ def main():
             padlock = Padlock(y)
             if ifPadlockHp0(padlock):
                 screen.blit(pygame.image.load(os.path.join(image_path,'key.png')),(10,y+10))              
+                padlockToKey = True 
             else: 
                 padlock.draw() 
                 screen.blit(padlock.small_healthbar,(0,y+72)) # 각각 자물쇠 hp 틀 그리기(빨간색)
@@ -124,9 +130,8 @@ def main():
 
         # 적 그리기 
         enemy_y = random.randint(50,450)
-        # enemy_y = 245
         if badtimer==0:
-            badguys.append([1000,enemy_y])
+            badguys.append([800,enemy_y])
             badtimer=100-(enemy.badtimer1*2) # 지금까지 badtimer가 몇 번 실행되었는지에 따라 badtimer 재설정.
             # 시간 지날수록 적 생성 속도 빨라짐
             if enemy.badtimer1>=35:
@@ -178,7 +183,6 @@ def main():
                     badguys.pop(index)
                     arrows.pop(index1)
                 index1 += 1
-            index=0
                 
             # 캐릭터와 적의 충돌처리
             player.rect.left = player.playerpos1[0]
@@ -202,14 +206,14 @@ def main():
             hpy += 100
         
         # 캐릭터 hp 처리
-        hpy = 620
+        hpx = 750
         for hp in range(0,player.hp):
-            screen.blit(heart,(hp+hpy,10))
-            hpy += 60
+            screen.blit(heart,(hpx-hp,10))
+            hpx -= 55
 
         # 화면 업데이트 
-        pygame.display.flip()
-        fpsClock.tick(FPS)
+        # pygame.display.flip()
+        # fpsClock.tick(FPS)
 
         # 키 이벤트 처리
         for event in pygame.event.get():
@@ -244,13 +248,21 @@ def main():
         elif keys[1]:
             player.playerpos[0]+=10
 
-        # 점수 처리
-        # sysfont = pygame.font.SysFont(None,72)
-        # scorefont = pygame.font.SysFont(None,36)
-        # message_clear = sysfont.render("!!CLEARED!!",True,(0,255,255))
-        # message_over = sysfont.render("GAME OVER!!",True,(0,255,255))
-        # message_rect = message_clear.get_rect()
-        # message_rect.center = (400,400)
+        # 게임오버 / 게임승리 체크
+        if player.hp==0 or padlockToKey:
+            gameOver = 1 # 게임오버
+            running = 0
 
+        # 게임오버시 
+        if gameOver :
+            sysfont = pygame.font.SysFont(None,40)
+            text = sysfont.render("GAME OVER!!",True,(0,255,255))
+            text_rect = text.get_rect()
+            text_rect.center = (400,250)
+            screen.blit(text,text_rect.topleft)
+            
+        pygame.display.flip()
+        fpsClock.tick(FPS)
 
 main()
+

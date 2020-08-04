@@ -21,7 +21,7 @@ class Player:
     def __init__(self):
         self.image = pygame.image.load(os.path.join(image_path, 'alien.png'))
         self.rect = pygame.Rect(self.image.get_rect())
-        self.hp = 2
+        self.hp = 5
 
     def draw(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -46,9 +46,8 @@ class Enemy:
         self.image = pygame.image.load(os.path.join(image_path, 'badguy.png'))
         self.rect = pygame.Rect(self.image.get_rect())
         
-    def draw(self):
-        pass 
-
+    def draw(self,badguy):
+        screen.blit(self.image,badguy)
 
 class Padlock:
     padlock_info = dict(id0=94,id1=94,id2=94,id3=94,id4=94) 
@@ -67,7 +66,6 @@ class Padlock:
     def collision(self,badguy,badguys,bangy,enemy,enemyindex):
         self.badguy = badguy 
         self.bangy = bangy # 폭탄 터지는 이미지
-        # self.enemyindex = enemyindex
         enemy.rect.left = badguy[0]
         enemy.rect.top = badguy[1]
 
@@ -75,7 +73,7 @@ class Padlock:
         sectionId = ['id0','id1','id2','id3','id4']
 
         for i in range(0,5):
-            if badguy[1]>section[i] and badguy[1]<section[i+1]:
+            if badguy[1]>section[i] and badguy[1]<=section[i+1]:
                 tmpId = sectionId[i]
                 break
 
@@ -153,12 +151,11 @@ def main():
             index = 0
 
             for badguy in badguys:
-
                 badguy[0]-=9 # 적의 x좌표를 조정하여 이동속도 조절 가능
 
+                # 자물쇠와 적의 충돌처리
                 # 좌표를 벗어나면 hp감소하는 걸로 함.
                 bangy = badguy[1]+5
-
                 padlock.collision(badguy,badguys,bangy,enemy,index)
                 
                 # 화살과 적의 충돌처리
@@ -183,7 +180,7 @@ def main():
 
             # 모든 적을 그림
             for badguy in badguys:
-                screen.blit(enemy.image,badguy)
+                enemy.draw(badguy)
 
             # 자물쇠 hp 처리
             hpy = 86
@@ -196,7 +193,7 @@ def main():
             hpx = 750
             for hp in range(0,player.hp):
                 screen.blit(heart,(hpx-hp,10))
-                hpx -= 55
+                hpx -= 55             
 
             # 키 이벤트 처리
             for event in pygame.event.get():
@@ -253,14 +250,15 @@ def main():
                         if event.key==pygame.K_q:
                             exitKey[0]=False 
 
-                sysfont = pygame.font.SysFont(None,80)
-                text = sysfont.render("GAME OVER!!",True,(0,255,255))
+                font = pygame.font.Font(None,80)
+                text = font.render("GAME OVER!!",True,(0,255,255))
                 text_rect = text.get_rect()
                 text_rect.center = (400,250)
                 screen.blit(text,text_rect.topleft)
-                
+                    
                 pygame.display.flip()
                 fpsClock.tick(FPS)
 
 main()
+
 

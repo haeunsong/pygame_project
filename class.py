@@ -13,7 +13,6 @@ current_path = os.path.dirname(__file__)
 image_path = os.path.join(current_path, 'images') 
 soil = pygame.image.load(os.path.join(image_path, 'soil.png'))
 key = pygame.image.load(os.path.join(image_path,'key.png'))
-bang = pygame.image.load(os.path.join(image_path,'bang.png'))
 heart = pygame.image.load(os.path.join(image_path,'heart.png'))
 
 class Player:
@@ -58,22 +57,40 @@ class Padlock:
         self.image = pygame.image.load(os.path.join(image_path, 'padlock.png'))
         self.small_health = pygame.image.load(os.path.join(image_path,'small_health.png'))
         self.small_healthbar = pygame.image.load(os.path.join(image_path,'small_healthbar.png'))
+        self.bang = pygame.image.load(os.path.join(image_path,'bang.png'))
         self.rect = pygame.Rect(self.image.get_rect())
         self.y = y
         
     def draw(self):
         screen.blit(self.image,(16,self.y))
     
-    def collision(self):
-        pass 
+    def collision(self,badguy,badguys,bangy,enemy,enemyindex):
+        self.badguy = badguy 
+        self.bangy = bangy # 폭탄 터지는 이미지
+        # self.enemyindex = enemyindex
+        enemy.rect.left = badguy[0]
+        enemy.rect.top = badguy[1]
 
-def ifPadlockHp0(padlock):
-    for value in padlock.padlock_info.values():
-        if value<=0: return True 
-        else: return False 
+        section = [0,100,200,300,400,500]
+        sectionId = ['id0','id1','id2','id3','id4']
+
+        for i in range(0,5):
+            if badguy[1]>section[i] and badguy[1]<section[i+1]:
+                tmpId = sectionId[i]
+                break
+
+        if enemy.rect.left<64:
+            self.padlock_info[str(tmpId)] -= 20
+            screen.blit(self.bang,(64,bangy))
+            badguys.pop(enemyindex)
+            
+    def ifPadlockHp0(self):
+        for value in self.padlock_info.values():
+            if value<=0: return True 
+            else: return False 
+
 
 def main():
-    # 메인루틴  
     running = 1
     badtimer = 50
     badguys = [[800,random.randint(50,450)]] # 적 처음 위치
@@ -81,8 +98,6 @@ def main():
     player = Player()
     padlockToKey = False 
     gameOver = 0
-    # exitcode = 0
-    again = 0
     exitKey = [False]
     padlock_y = [13,113,213,313,413]
     arrows=[] # 화살각도, 화살 x좌표, 화살 y좌표 
@@ -100,16 +115,16 @@ def main():
 
             for y in padlock_y:
                 padlock = Padlock(y)
-                if ifPadlockHp0(padlock):
+                if padlock.ifPadlockHp0():
                     screen.blit(pygame.image.load(os.path.join(image_path,'key.png')),(10,y+10))              
                     padlockToKey = True 
                 else: 
                     padlock.draw() 
                     screen.blit(padlock.small_healthbar,(0,y+72)) # 각각 자물쇠 hp 틀 그리기(빨간색)
-            player.draw()
+            
+            player.draw() 
             
             # 총알 그리기
-
             for bullet in arrows:
                 index=0
                 velx=math.cos(bullet[0])*20
@@ -138,38 +153,14 @@ def main():
             index = 0
 
             for badguy in badguys:
-                # if badguy[0]<-64: # 적의 x위치 업데이트 후 화면 벗어나면 제거
-                #     badguys.pop(index)
 
                 badguy[0]-=9 # 적의 x좌표를 조정하여 이동속도 조절 가능
 
-                # 적과 자물쇠의 충돌처리
-                enemy.rect.top = badguy[1] # 적의 y좌표
-                enemy.rect.left = badguy[0] # 적의 x좌표
-
                 # 좌표를 벗어나면 hp감소하는 걸로 함.
                 bangy = badguy[1]+5
-                if enemy.rect.left < 64 and 0<badguy[1]<=100 :
-                    padlock.padlock_info['id0'] -= 20
-                    screen.blit(bang,(64,bangy))
-                    badguys.pop(index)
-                elif enemy.rect.left < 64 and 100<badguy[1]<=200 :
-                    padlock.padlock_info['id1'] -= 20
-                    screen.blit(bang,(64,bangy))
-                    badguys.pop(index)
-                elif enemy.rect.left < 64 and 200<badguy[1]<=300 :
-                    padlock.padlock_info['id2'] -= 20
-                    screen.blit(bang,(64,bangy))
-                    badguys.pop(index)
-                elif enemy.rect.left < 64 and 300<badguy[1]<=400 :
-                    padlock.padlock_info['id3'] -= 20
-                    screen.blit(bang,(64,bangy))
-                    badguys.pop(index)
-                elif enemy.rect.left < 64 and 400<enemy_y<=500 :
-                    padlock.padlock_info['id4'] -= 20
-                    screen.blit(bang,(64,bangy))
-                    badguys.pop(index)   
 
+                padlock.collision(badguy,badguys,bangy,enemy,index)
+                
                 # 화살과 적의 충돌처리
                 index1 = 0           
                 for bullet in arrows:
@@ -229,12 +220,9 @@ def main():
                         keys[0]=False
                     elif event.key==pygame.K_d:
                         keys[1]=False
-
-                    
-            # 마우스 클릭하면
+                # 마우스 클릭시
                 elif event.type==pygame.MOUSEBUTTONDOWN:
                     mousepos=pygame.mouse.get_pos()
-                # acc[1]+=1 # 화살 발사 횟수 증가
                     arrows.append([math.atan2(mousepos[1]-player.playerpos1[1],mousepos[0]-player.playerpos1[0]),player.playerpos1[0]+32,player.playerpos1[1]+32])
             
             if keys[0]:
@@ -262,7 +250,7 @@ def main():
                             running = 0
                             break
                     elif event.type==pygame.KEYUP:
-                        if event.key==pygame.K_c:
+                        if event.key==pygame.K_q:
                             exitKey[0]=False 
 
                 sysfont = pygame.font.SysFont(None,80)

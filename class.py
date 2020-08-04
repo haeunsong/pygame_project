@@ -8,21 +8,13 @@ width, height = 800,500
 screen=pygame.display.set_mode((width,height))
 FPS=30 # 속도
 fpsClock=pygame.time.Clock()
-# arrows=[] # 화살각도, 화살 x좌표, 화살 y좌표 
-
-# keys=[False,False] 
 
 current_path = os.path.dirname(__file__) 
 image_path = os.path.join(current_path, 'images') 
-# healthbar = pygame.image.load(os.path.join(image_path, 'healthbar.png'))
-# health = pygame.image.load(os.path.join(image_path, 'health.png'))
 soil = pygame.image.load(os.path.join(image_path, 'soil.png'))
 key = pygame.image.load(os.path.join(image_path,'key.png'))
 bang = pygame.image.load(os.path.join(image_path,'bang.png'))
 heart = pygame.image.load(os.path.join(image_path,'heart.png'))
-
-# running = 1 # 게임 실행
-# exitcode = 0 # 1이 되면 게임 종료
 
 class Player:
     playerpos = [154,155]
@@ -69,8 +61,6 @@ class Padlock:
         self.rect = pygame.Rect(self.image.get_rect())
         self.y = y
         
-
-
     def draw(self):
         screen.blit(self.image,(16,self.y))
     
@@ -82,38 +72,8 @@ def ifPadlockHp0(padlock):
         if value<=0: return True 
         else: return False 
 
-# def afterGameOver(running,gameOver):
-#     exitKey = [False]
-#     while True:
-#         for event in pygame.event.get():
-#             if event.type==pygame.QUIT:
-#                 pygame.quit()
-#                 exit(0)
-#             elif event.type==pygame.KEYDOWN:
-#                 if event.key==pygame.K_c:
-#                     exitKey[0]=True 
-#                     running=1
-#                     gameOver=0
-#                     break
-#             elif event.type==pygame.KEYUP:
-#                 if event.key==pygame.K_c:
-#                     exitKey[0]=False 
-
-#         sysfont = pygame.font.SysFont(None,80)
-#         text = sysfont.render("GAME OVER!!",True,(0,255,255))
-#         text_rect = text.get_rect()
-#         text_rect.center = (400,250)
-#         screen.blit(text,text_rect.topleft)
-#         pygame.display.flip()
-#         fpsClock.tick(FPS)
-    
-#     return running,gameOver
-    
-def continueGame():
-    main()
-
 def main():
-    # 메인루틴
+    # 메인루틴  
     running = 1
     badtimer = 50
     badguys = [[800,random.randint(50,450)]] # 적 처음 위치
@@ -128,23 +88,8 @@ def main():
     arrows=[] # 화살각도, 화살 x좌표, 화살 y좌표 
     keys=[False,False] 
     
-
     while running :
-        # if again:
-        #     enemy = Enemy()
-        #     player = Player()
-            
-        #     for y in padlock_y:
-        #         padlock = Padlock(y)
-        #         if ifPadlockHp0(padlock):
-        #             screen.blit(pygame.image.load(os.path.join(image_path,'key.png')),(10,y+10))              
-        #             padlockToKey = True 
-        #         else: 
-        #             padlock.draw() 
-        #             screen.blit(padlock.small_healthbar,(0,y+72)) # 각각 자물쇠 hp 틀 그리기(빨간색)
-
         if not gameOver:
-            again = 0
             badtimer -= 2
             screen.fill((102,62,37)) # 갈색 배경으로 초기화
 
@@ -152,8 +97,6 @@ def main():
             for x in range(int(width/soil.get_width()+1)):
                 for y in range(int(height/soil.get_width()+1)): 
                     screen.blit(soil,(x*100,y*100)) # 이미지의 왼쪽 위 좌표
-
-            # padlock_y = [13,113,213,313,413]
 
             for y in padlock_y:
                 padlock = Padlock(y)
@@ -264,10 +207,6 @@ def main():
                 screen.blit(heart,(hpx-hp,10))
                 hpx -= 55
 
-            # 화면 업데이트 
-            # pygame.display.flip()
-            # fpsClock.tick(FPS)
-
             # 키 이벤트 처리
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
@@ -306,44 +245,22 @@ def main():
             # 게임오버 / 게임승리 체크
             if player.hp==0 or padlockToKey:
                 gameOver = 1 # 게임오버
-                # running = 0
 
-            # 게임오버시 
-            # if gameOver :
-            #     sysfont = pygame.font.SysFont(None,80)
-            #     text = sysfont.render("GAME OVER!!",True,(0,255,255))
-            #     text_rect = text.get_rect()
-            #     text_rect.center = (400,250)
-            #     screen.blit(text,text_rect.topleft)
-            #     running = 0
-            #     # exitcode = 1 
-            
             pygame.display.flip()
             fpsClock.tick(FPS)
         
         if gameOver:
-            # running,gameOver = afterGameOver(running,gameOver)
-            # main()
             while True:
                 for event in pygame.event.get():
                     if event.type==pygame.QUIT:
                         pygame.quit()
                         exit(0)
                     elif event.type==pygame.KEYDOWN:
-                        if event.key==pygame.K_c:
+                        if event.key==pygame.K_q:
                             exitKey[0]=True 
-                            again = 1
-                            gameOver = 1
+                            gameOver = 0
                             running = 0
-                            continueGame()
-
-
                             break
-                            # running=1
-                            # gameOver=0
-                            # again=1
-                            # main()
-                            # break
                     elif event.type==pygame.KEYUP:
                         if event.key==pygame.K_c:
                             exitKey[0]=False 
@@ -353,12 +270,9 @@ def main():
                 text_rect = text.get_rect()
                 text_rect.center = (400,250)
                 screen.blit(text,text_rect.topleft)
+                
                 pygame.display.flip()
                 fpsClock.tick(FPS)
-
-    if again:
-        continueGame()
-
 
 main()
 

@@ -7,7 +7,7 @@ pygame.font.init()
 width, height = 800,500
 screen=pygame.display.set_mode((width,height))
 pygame.display.set_caption("** Defend Padlock **")
-FPS=30 
+FPS=50 
 fpsClock=pygame.time.Clock()
 
 current_path = os.path.dirname(__file__) 
@@ -118,6 +118,43 @@ class Timer:
             elapsed += time.time() - self.last_start_time
         return elapsed
 
+def startScreen():
+    keyC = False
+    while True:
+        screen.fill((0,0,0))
+        font = pygame.font.Font(None,100)
+        title = font.render("Defend Padlock",True,(0,198,255))
+        title_rect = title.get_rect()
+        title_rect.center = (400,80)
+        screen.blit(title,title_rect.topleft)
+
+        font = pygame.font.Font(None,40)
+        winText = font.render("WIN --> ",True,(0,255,0))
+        loseText = font.render("LOSE --> ",True,(255,0,0))
+        secondText = font.render("Defend for 90 seconds",True,(255,255,255))
+        thirdText = font.render("All padlocks -> keys or Player dies",True,(255,255,255))
+        pressText = font.render("Press c to continue...",True,(255,255,0))
+        screen.blit(winText,(90,200))
+        screen.blit(loseText,(90,260))
+        screen.blit(secondText,(250,200))
+        screen.blit(thirdText,(250,260))
+        screen.blit(pressText,(250,380))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                exit(0)
+            elif event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_c:
+                    keyC = True 
+            elif event.type==pygame.KEYUP:
+                if event.key==pygame.K_c:
+                    keyC=False 
+        if keyC:
+            break
+
 def drawStar(padlock):
     starx=[]
     plus=30
@@ -158,44 +195,6 @@ def handleGameOver(padlock,gameWin,gameLose):
 
         pygame.display.flip()
         fpsClock.tick(FPS)
-
-def startScreen():
-    keyC = False
-    while True:
-        screen.fill((0,0,0))
-        font = pygame.font.Font(None,100)
-        title = font.render("Defend Padlock",True,(0,198,255))
-        title_rect = title.get_rect()
-        title_rect.center = (400,80)
-        screen.blit(title,title_rect.topleft)
-
-        font = pygame.font.Font(None,40)
-        winText = font.render("WIN --> ",True,(0,255,0))
-        loseText = font.render("LOSE --> ",True,(255,0,0))
-        secondText = font.render("Defend for 90 seconds",True,(255,255,255))
-        ThirdText = font.render("All padlocks -> keys or Player dies",True,(255,255,255))
-        pressText = font.render("Press c to continue...",True,(255,255,0))
-        screen.blit(winText,(90,200))
-        screen.blit(loseText,(90,260))
-        screen.blit(secondText,(250,200))
-        screen.blit(ThirdText,(250,260))
-        screen.blit(pressText,(250,380))
-
-        pygame.display.flip()
-
-        for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                pygame.quit()
-                exit(0)
-            elif event.type==pygame.KEYDOWN:
-                if event.key==pygame.K_c:
-                    keyC = True 
-            elif event.type==pygame.KEYUP:
-                if event.key==pygame.K_c:
-                    keyC=False 
-
-        if keyC:
-            break
 
 def main():
     running = 1

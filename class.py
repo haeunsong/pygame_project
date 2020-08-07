@@ -299,8 +299,6 @@ def main():
                 pygame.display.flip()
                 fpsClock.tick(FPS)
 
-timer = Timer()
-timer.start()
 main()
 
 

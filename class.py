@@ -1,4 +1,4 @@
-import pygame,os,math,random,sys
+import pygame,os,math,random,sys,threading,time
 from pygame.locals import *
 
 pygame.init()
@@ -21,7 +21,7 @@ class Player:
     def __init__(self):
         self.image = pygame.image.load(os.path.join(image_path, 'alien.png'))
         self.rect = pygame.Rect(self.image.get_rect())
-        self.hp = 5
+        self.hp = 1
 
     def draw(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -87,7 +87,24 @@ class Padlock:
             if value<=0: return True 
             else: return False 
 
+class Timer:
+    def __init__(self):
+        self.elapsed = 0.0 
+        self.running = False 
+        self.last_start_time = None 
 
+    def start(self):
+        if not self.running:
+            self.running = True 
+            self.last_start_time = time.time()
+
+    def get_elapsed(self):
+        elapsed = self.elapsed
+        if self.running:
+            elapsed += time.time() - self.last_start_time
+        return elapsed
+
+       
 def main():
     running = 1
     badtimer = 50
@@ -96,12 +113,19 @@ def main():
     player = Player()
     padlockToKey = False 
     gameOver = 0
+    gameWin = 0
     exitKey = [False]
     padlock_y = [13,113,213,313,413]
     arrows=[] # 화살각도, 화살 x좌표, 화살 y좌표 
     keys=[False,False] 
+
     
+    timer = Timer()
+    timer.start()
+    
+    global timerResult
     while running :
+        timerResult = round(timer.get_elapsed())
         if not gameOver:
             badtimer -= 2
             screen.fill((102,62,37)) # 갈색 배경으로 초기화
@@ -195,6 +219,16 @@ def main():
                 screen.blit(heart,(hpx-hp,10))
                 hpx -= 55             
 
+            # 시계 표시
+            font = pygame.font.Font(None,80)
+            timeValue = 10-timerResult
+            if timeValue<=10:
+                timerText = font.render(str(timeValue),True,(255,255,62))
+            else:
+                timerText = font.render(str(timeValue),True,(0,0,0))
+            screen.blit(timerText,(720,420))
+            
+
             # 키 이벤트 처리
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
@@ -229,7 +263,10 @@ def main():
 
             # 게임오버 / 게임승리 체크
             if player.hp==0 or padlockToKey:
-                gameOver = 1 # 게임오버
+                gameOver = 1 # 게임종료
+            if timeValue==0:
+                gameOver = 1
+                gameWin=1
 
             pygame.display.flip()
             fpsClock.tick(FPS)
@@ -251,14 +288,22 @@ def main():
                             exitKey[0]=False 
 
                 font = pygame.font.Font(None,80)
-                text = font.render("GAME OVER!!",True,(0,255,255))
+                if gameWin:
+                    text = font.render("CONGRATULATION!!",True,(255,0,0),(0,220,255))
+                else:
+                    text = font.render("GAME OVER!!",True,(0,220,255),(255,0,0))
                 text_rect = text.get_rect()
                 text_rect.center = (400,250)
                 screen.blit(text,text_rect.topleft)
-                    
+
                 pygame.display.flip()
                 fpsClock.tick(FPS)
 
+timer = Timer()
+timer.start()
 main()
+
+
+
 
 

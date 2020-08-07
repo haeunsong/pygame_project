@@ -21,7 +21,7 @@ class Player:
     def __init__(self):
         self.image = pygame.image.load(os.path.join(image_path, 'alien.png'))
         self.rect = pygame.Rect(self.image.get_rect())
-        self.hp = 1
+        self.hp = 3
 
     def draw(self):
         self.mousepos = pygame.mouse.get_pos()
@@ -221,7 +221,7 @@ def main():
 
             # 시계 표시
             font = pygame.font.Font(None,80)
-            timeValue = 10-timerResult
+            timeValue = 90-timerResult # 90초 카운트다운
             if timeValue<=10:
                 timerText = font.render(str(timeValue),True,(255,255,62))
             else:

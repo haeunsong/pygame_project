@@ -1,4 +1,4 @@
-import pygame,os,math,random,threading,time
+import pygame,os,math,random,time
 from pygame.locals import *
 
 pygame.init()
@@ -7,7 +7,7 @@ pygame.font.init()
 width, height = 800,500
 screen=pygame.display.set_mode((width,height))
 pygame.display.set_caption("** Defend Padlock **")
-FPS=50 
+FPS=40 
 fpsClock=pygame.time.Clock()
 
 current_path = os.path.dirname(__file__) 
@@ -207,7 +207,7 @@ def main():
     gameWin = 0
     gameLose = 0
     padlock_y = [13,113,213,313,413]
-    arrows=[] # 화살각도, 화살 x좌표, 화살 y좌표 
+    arrows=[] # 총알각도, 총알 x좌표, 총알 y좌표 
     keys=[False,False] 
 
     timer = Timer()
@@ -239,12 +239,12 @@ def main():
             # 총알 그리기
             for bullet in arrows:
                 index=0
-                velx=math.cos(bullet[0])*20
-                vely=math.sin(bullet[0])*20
+                velx=math.cos(bullet[0])*30
+                vely=math.sin(bullet[0])*30
                 bullet[1]+=velx
                 bullet[2]+=vely 
-                # 범위 벗어나면 화살 삭제
-                if bullet[1]>1000 or bullet[2]>500 or bullet[1]<-64 or bullet[2]<-64 :
+                # 범위 벗어나면 총알 삭제
+                if bullet[1]>1000 or bullet[2]>500 :
                     arrows.pop(index)
                 index+=1
                 shot = Shot(bullet[1],bullet[2])

@@ -371,8 +371,3 @@ def main():
         
 startScreen()  
 main()
-
-
-
-
-

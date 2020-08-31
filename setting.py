@@ -3,7 +3,7 @@ import pygame,os
 width, height = 800,500
 screen=pygame.display.set_mode((width,height))
 pygame.display.set_caption("** Defend Padlock **")
-FPS=40 
+FPS=50 
 fpsClock=pygame.time.Clock()
 
 current_path = os.path.dirname(__file__) 
